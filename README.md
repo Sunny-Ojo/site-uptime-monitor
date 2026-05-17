@@ -68,3 +68,6 @@ To run the feature and unit tests:
 ```bash
 php artisan test
 ```
+
+## Architectural Choices
+*   **Database Choice (MySQL)**: I chose MySQL because the `due()` scope on the `Monitor` model relies on the native `TIMESTAMPDIFF` function. This allows us to calculate which monitors are due directly at the database level, ensuring high performance as the number of monitors grows.
