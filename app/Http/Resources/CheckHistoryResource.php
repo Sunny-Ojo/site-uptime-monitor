@@ -20,7 +20,7 @@ class CheckHistoryResource extends JsonResource
             'status_code' => $this->status_code,
             'response_time_ms' => $this->response_time_ms,
             'is_up' => $this->is_up,
-            'checked_at' => $this->checked_at->toIso8601String(),
+            'checked_at' => $this->checked_at,
         ];
     }
 }

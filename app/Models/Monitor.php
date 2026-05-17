@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Enums\SiteStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Monitor extends Model
@@ -39,6 +40,22 @@ class Monitor extends Model
         return $this->hasMany(CheckHistory::class);
     }
 
+    public function scopeDue(Builder $query): Builder
+    {
+        return $query->where(function (Builder $query) {
+
+            $query->whereNull('last_checked_at')
+                ->orWhereRaw(
+                    '
+                    TIMESTAMPDIFF(
+                        MINUTE,
+                        last_checked_at,
+                        NOW()
+                    ) >= check_interval
+                    '
+                );
+        });
+    }
     /**
      * Calculate the uptime percentage.
      */
