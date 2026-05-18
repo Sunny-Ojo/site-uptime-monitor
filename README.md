@@ -4,7 +4,7 @@ An API-based site uptime monitor built with Laravel 13. This application allows 
 
 ## Tech Stack
 - **Framework**: Laravel 13.x
-- **PHP Version**: 8.4+ (Developed on 8.3.31)
+- **PHP Version**: 8.4+ (Works on 8.3.31 too)
 - **Database**: MySQL
 
 ## Setup Instructions
