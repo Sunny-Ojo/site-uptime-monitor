@@ -56,12 +56,40 @@ An API-based site uptime monitor built with Laravel 13. This application allows 
    php artisan migrate
    ```
 
+## API Endpoints & Authentication
+
+All monitor endpoints are protected and require a Bearer token so as to ensure users fetches only their own data.
+
+### Required Headers
+
+Include the following headers in all requests to protected endpoints:
+
+- `Authorization`: `Bearer <your_token>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+### Auth Endpoints
+- **POST** `/api/register`: Register a new user. Returns a token.
+- **POST** `/api/login`: Login with existing credentials. Returns a token.
+- **POST** `/api/forgot-password`: Send password reset link.
+- **POST** `/api/reset-password`: Reset password using token.
+
+### Monitor Endpoints
+- **GET** `/api/monitors`: List all monitors for the authenticated user.
+- **POST** `/api/monitors`: Create a new monitor.
+- **GET** `/api/monitors/{id}/history`: Fetch check history for a specific monitor.
+
 ## Running the Monitor Checks
 To manually trigger the monitor checks, run the following Artisan command:
 ```bash
 php artisan monitor:check
 ```
-*In production, this command should be scheduled to run every minute using Laravel's scheduler.*
+
+## Running the Queue
+To run the queue, run the following Artisan command:
+```bash
+php artisan queue:work
+```
 
 ## Running Tests
 To run the feature and unit tests:

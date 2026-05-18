@@ -3,9 +3,16 @@
 use App\Enums\SiteStatus;
 use App\Models\Monitor;
 use App\Models\CheckHistory;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    Sanctum::actingAs($this->user);
+});
 
 test('it can register a new monitor', function () {
     $response = $this->postJson('/api/monitors', [
@@ -24,7 +31,8 @@ test('it can register a new monitor', function () {
         ->assertJsonPath('data.status', SiteStatus::PENDING->value);
 
     $this->assertDatabaseHas('monitors', [
-        'url' => 'https://www.google.com'
+        'url' => 'https://www.google.com',
+        'user_id' => $this->user->id
     ]);
 });
 
@@ -36,7 +44,7 @@ test('it validates the monitor request', function () {
 });
 
 test('it rejects duplicate urls', function () {
-    Monitor::create(['url' => 'https://www.google.com']);
+    Monitor::create(['url' => 'https://www.google.com', 'user_id' => $this->user->id]);
 
     $response = $this->postJson('/api/monitors', [
         'url' => 'https://www.google.com'
@@ -47,8 +55,8 @@ test('it rejects duplicate urls', function () {
 });
 
 test('it can list all monitors', function () {
-    Monitor::create(['url' => 'https://example1.com']);
-    Monitor::create(['url' => 'https://example2.com']);
+    Monitor::create(['url' => 'https://example1.com', 'user_id' => $this->user->id]);
+    Monitor::create(['url' => 'https://example2.com', 'user_id' => $this->user->id]);
 
     $response = $this->getJson('/api/monitors');
 
@@ -57,7 +65,7 @@ test('it can list all monitors', function () {
 });
 
 test('it can fetch check history for a monitor', function () {
-    $monitor = Monitor::create(['url' => 'https://www.google.com']);
+    $monitor = Monitor::create(['url' => 'https://www.google.com', 'user_id' => $this->user->id]);
     CheckHistory::create([
         'monitor_id' => $monitor->id,
         'status_code' => 200,
