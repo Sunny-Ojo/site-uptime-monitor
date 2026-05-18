@@ -21,14 +21,11 @@ class MonitorController extends Controller
         protected MonitorService $monitorService
     ) {}
 
-    /**
-     * List all monitors.
-     */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
             return $this->success(
-                MonitorResource::collection($this->monitorService->getAllMonitors())
+                MonitorResource::collection($this->monitorService->getAllMonitors($request->user()->id))
             );
         } catch (\Exception $e) {
             Log::error('Error fetching monitors: ' . $e->getMessage());
@@ -36,13 +33,12 @@ class MonitorController extends Controller
         }
     }
 
-    /**
-     * Register a new monitor.
-     */
     public function store(StoreMonitorRequest $request): JsonResponse
     {
         try {
-            $monitor = $this->monitorService->createMonitor($request->validated());
+            $data = $request->validated();
+            $data['user_id'] = $request->user()->id;
+            $monitor = $this->monitorService->createMonitor($data);
             return $this->success(new MonitorResource($monitor), 201);
         } catch (\Exception $e) {
             Log::error('Error creating monitor: ' . $e->getMessage());
@@ -50,27 +46,24 @@ class MonitorController extends Controller
         }
     }
 
-    /**
-     * Fetch check history for a specific monitor.
-     */
     public function history(MonitorHistoryRequest $request, int $id): JsonResponse
     {
         try {
             $monitor = $this->monitorService->findMonitor($id);
 
-            if (!$monitor) {
+            if (!$monitor || $monitor->user_id !== $request->user()->id) {
                 return $this->notFound('Monitor not found.');
             }
 
-            $history = $this->monitorService->getMonitorHistory(
+            $paginator = $this->monitorService->getMonitorHistory(
                 $monitor,
                 $request->integer('per_page', 15),
                 $request->integer('page', 1)
             );
 
             return $this->paginate(
-                CheckHistoryResource::collection($history),
-                $history
+                CheckHistoryResource::collection($paginator),
+                $paginator
             );
         } catch (\Exception $e) {
             Log::error('Error fetching monitor history', [

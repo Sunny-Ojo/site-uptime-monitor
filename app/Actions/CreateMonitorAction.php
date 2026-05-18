@@ -18,6 +18,7 @@ class CreateMonitorAction
             'url' => $data['url'],
             'check_interval' => $data['check_interval'] ?? 5,
             'threshold' => $data['threshold'] ?? 3,
+            'user_id' => $data['user_id'] ?? null,
         ]);
     }
 }

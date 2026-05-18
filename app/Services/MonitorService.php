@@ -19,9 +19,9 @@ class MonitorService
     /**
      * Get all monitors.
      */
-    public function getAllMonitors(): Collection
+    public function getAllMonitors(int $userId): Collection
     {
-        return Monitor::all();
+        return Monitor::where('user_id', $userId)->get();
     }
 
     /**

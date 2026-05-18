@@ -17,6 +17,7 @@ class Monitor extends Model
     ];
 
     protected $fillable = [
+        'user_id',
         'url',
         'check_interval',
         'threshold',
@@ -38,6 +39,14 @@ class Monitor extends Model
     public function histories(): HasMany
     {
         return $this->hasMany(CheckHistory::class);
+    }
+
+    /**
+     * Get the user that owns the monitor.
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     public function scopeDue(Builder $query): Builder
